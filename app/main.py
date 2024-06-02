@@ -21,13 +21,37 @@ def read():
         return []
 
 
+def builtin_exit(_):
+    exit(0)
+
+
+def builtin_echo(arguments: typing.List[str]):
+    print(" ".join(arguments[1:]))
+
+
+def builtin_type(arguments: typing.List[str]):
+    program = arguments[1]
+    
+    builtin = builtins.get(program)
+    if builtin:
+        print(f"{program} is a shell builtin")
+    else:
+        print(f"{program} not found")
+
+
+builtins = {
+    "exit": builtin_exit,
+    "echo": builtin_echo,
+    "type": builtin_type,
+}
+
+
 def eval(arguments: typing.List[str]):
     program = arguments[0]
 
-    if program == "exit":
-        exit(0)
-    elif program == "echo":
-        print(" ".join(arguments[1:]))
+    builtin = builtins.get(program)
+    if builtin:
+        builtin(arguments)
     else:
         print(f"{program}: command not found")
 
