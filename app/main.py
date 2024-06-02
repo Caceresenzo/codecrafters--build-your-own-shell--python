@@ -30,7 +30,7 @@ def which(program: str):
 
         if os.path.exists(path):
             return path
-    
+
     return None
 
 
@@ -44,7 +44,7 @@ def builtin_echo(arguments: typing.List[str]):
 
 def builtin_type(arguments: typing.List[str]):
     program = arguments[1]
-    
+
     builtin = builtins.get(program)
     if builtin:
         print(f"{program} is a shell builtin")
@@ -66,17 +66,24 @@ def builtin_cd(arguments: typing.List[str]):
     path = arguments[1]
 
     try:
+        absolute = None
+
         if path.startswith("/"):
             absolute = path
         elif path.startswith("."):
             absolute = os.path.join(os.getcwd(), path)
-            absolute = os.path.normpath(absolute)
+        elif path.startswith("~"):
+            home = os.environ.get("HOME")
+            if home:
+                absolute = os.path.join(home, path[1:])
+            else:
+                print(f"{path}: $HOME not set")
         else:
-            absolute = None
             print(f"{path}: unsupported path")
 
         if absolute:
-            os.chdir(path)
+            absolute = os.path.normpath(absolute)
+            os.chdir(absolute)
     except FileNotFoundError:
         # print(f"cd: {path}: No such file or directory")
         print(f"{path}: No such file or directory")
