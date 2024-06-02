@@ -1,15 +1,42 @@
+import typing
 import sys
 
 
-def main():
+def read():
     sys.stdout.write("$ ")
     sys.stdout.flush()
 
-    line = input()
-    arguments = line.split(" ")
+    try:
+        line = input()
 
+        if not len(line):
+            return []
+
+        return line.split(" ")
+    except EOFError:
+        return None
+    except KeyboardInterrupt:
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        return []
+
+
+def eval(arguments: typing.List[str]):
     program = arguments[0]
     print(f"{program}: command not found")
+
+
+def main():
+    while True:
+        arguments = read()
+
+        if arguments is None:
+            break
+
+        if not len(arguments):
+            continue
+
+        eval(arguments)
 
 
 if __name__ == "__main__":
