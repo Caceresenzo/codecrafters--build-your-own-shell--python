@@ -65,10 +65,19 @@ def builtin_pwd(_):
 def builtin_cd(arguments: typing.List[str]):
     path = arguments[1]
 
-    if path.startswith("/"):
-        os.chdir(path)
-    else:
-        print(f"{path}: unsupported path")
+    try:
+        if path.startswith("/"):
+            absolute = path
+        else:
+            absolute = None
+            print(f"{path}: unsupported path")
+
+        if absolute:
+            os.chdir(path)
+    except FileNotFoundError:
+        print(f"cd: {path}: No such file or directory")
+    except PermissionError:
+        print(f"cd: {path}: Permission denied")
 
 
 builtins = {
