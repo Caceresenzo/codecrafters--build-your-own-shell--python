@@ -23,7 +23,11 @@ def read():
 
 def eval(arguments: typing.List[str]):
     program = arguments[0]
-    print(f"{program}: command not found")
+
+    if program == "exit":
+        exit(0)
+    else:
+        print(f"{program}: command not found")
 
 
 def main():
