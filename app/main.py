@@ -68,6 +68,9 @@ def builtin_cd(arguments: typing.List[str]):
     try:
         if path.startswith("/"):
             absolute = path
+        elif path.startswith("."):
+            absolute = os.path.join(os.getcwd(), path)
+            absolute = os.path.normpath(absolute)
         else:
             absolute = None
             print(f"{path}: unsupported path")
