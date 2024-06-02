@@ -75,9 +75,11 @@ def builtin_cd(arguments: typing.List[str]):
         if absolute:
             os.chdir(path)
     except FileNotFoundError:
-        print(f"cd: {path}: No such file or directory")
+        # print(f"cd: {path}: No such file or directory")
+        print(f"{path}: No such file or directory")
     except PermissionError:
-        print(f"cd: {path}: Permission denied")
+        # print(f"cd: {path}: Permission denied")
+        print(f"{path}: Permission denied")
 
 
 builtins = {
