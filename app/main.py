@@ -62,11 +62,21 @@ def builtin_pwd(_):
     print(os.getcwd())
 
 
+def builtin_cd(arguments: typing.List[str]):
+    path = arguments[1]
+
+    if path.startswith("/"):
+        os.chdir(path)
+    else:
+        print(f"{path}: unsupported path")
+
+
 builtins = {
     "exit": builtin_exit,
     "echo": builtin_echo,
     "type": builtin_type,
     "pwd": builtin_pwd,
+    "cd": builtin_cd,
 }
 
 
