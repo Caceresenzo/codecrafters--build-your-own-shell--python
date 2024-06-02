@@ -58,10 +58,15 @@ def builtin_type(arguments: typing.List[str]):
     print(f"{program} not found")
 
 
+def builtin_pwd(_):
+    print(os.getcwd())
+
+
 builtins = {
     "exit": builtin_exit,
     "echo": builtin_echo,
     "type": builtin_type,
+    "pwd": builtin_pwd,
 }
 
 
