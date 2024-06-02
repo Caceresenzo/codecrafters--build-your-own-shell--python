@@ -1,5 +1,6 @@
 import typing
 import sys
+import os
 
 
 def read():
@@ -21,6 +22,18 @@ def read():
         return []
 
 
+def which(program: str):
+    paths = os.environ.get("PATH", "").split(":")
+
+    for path in paths:
+        path = os.path.join(path, program)
+
+        if os.path.exists(path):
+            return path
+    
+    return None
+
+
 def builtin_exit(_):
     exit(0)
 
@@ -35,8 +48,14 @@ def builtin_type(arguments: typing.List[str]):
     builtin = builtins.get(program)
     if builtin:
         print(f"{program} is a shell builtin")
-    else:
-        print(f"{program} not found")
+        return
+
+    path = which(program)
+    if path:
+        print(f"{program} is {path}")
+        return
+
+    print(f"{program} not found")
 
 
 builtins = {
