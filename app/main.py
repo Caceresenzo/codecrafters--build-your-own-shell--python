@@ -26,6 +26,8 @@ def eval(arguments: typing.List[str]):
 
     if program == "exit":
         exit(0)
+    elif program == "echo":
+        print(" ".join(arguments[1:]))
     else:
         print(f"{program}: command not found")
 
