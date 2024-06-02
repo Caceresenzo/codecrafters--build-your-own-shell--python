@@ -71,8 +71,20 @@ def eval(arguments: typing.List[str]):
     builtin = builtins.get(program)
     if builtin:
         builtin(arguments)
-    else:
-        print(f"{program}: command not found")
+        return
+
+    path = which(program)
+    if path:
+        pid = os.fork()
+
+        if not pid:
+            os.execv(path, arguments)
+            exit(1)
+
+        os.waitpid(pid, 0)
+        return
+
+    print(f"{program}: command not found")
 
 
 def main():
