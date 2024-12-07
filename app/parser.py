@@ -52,9 +52,20 @@ class LineParser:
             return
 
         if in_quote:
-            self._builder += BACKSLASH
+            mapped = self._map_backlash_character(character)
+
+            if mapped != END:
+                character = mapped
+            else:
+                self._builder += BACKSLASH
 
         self._builder += character
+
+    def _map_backlash_character(self, character: str):
+        if character in [DOUBLE, BACKSLASH]:
+            return character
+
+        return END
 
     def _next(self):
         return next(self._iterator, END)
