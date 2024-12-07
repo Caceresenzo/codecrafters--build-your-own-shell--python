@@ -4,6 +4,7 @@ END = "\0"
 SPACE = " "
 SINGLE = "'"
 DOUBLE = '"'
+BACKSLASH = "\\"
 
 
 class LineParser:
@@ -24,6 +25,8 @@ class LineParser:
                 self._single_quote()
             elif character == DOUBLE:
                 self._double_quote()
+            elif character == BACKSLASH:
+                self._backslash(False)
             else:
                 self._builder += character
 
@@ -38,7 +41,20 @@ class LineParser:
 
     def _double_quote(self):
         while (character := self._next()) != END and character != DOUBLE:
-            self._builder += character
+            if character == BACKSLASH:
+                self._backslash(True)
+            else:
+                self._builder += character
+
+    def _backslash(self, in_quote: bool):
+        character = self._next()
+        if character == END:
+            return
+
+        if in_quote:
+            self._builder += BACKSLASH
+
+        self._builder += character
 
     def _next(self):
         return next(self._iterator, END)
