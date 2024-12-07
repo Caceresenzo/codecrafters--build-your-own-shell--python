@@ -35,7 +35,7 @@ def builtin_type(arguments: typing.List[str]):
         print(f"{program} is {path}")
         return
 
-    print(f"{program} not found")
+    print(f"{program}: not found")
 
 
 def builtin_pwd(_):
