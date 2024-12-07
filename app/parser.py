@@ -3,6 +3,8 @@ import typing
 END = "\0"
 SPACE = " "
 SINGLE = "'"
+DOUBLE = '"'
+
 
 class LineParser:
 
@@ -20,16 +22,22 @@ class LineParser:
                     self._builder = ""
             elif character == SINGLE:
                 self._single_quote()
+            elif character == DOUBLE:
+                self._double_quote()
             else:
                 self._builder += character
-        
+
         if self._builder:
             strings.append(self._builder)
-        
+
         return strings
-    
+
     def _single_quote(self):
         while (character := self._next()) != END and character != SINGLE:
+            self._builder += character
+
+    def _double_quote(self):
+        while (character := self._next()) != END and character != DOUBLE:
             self._builder += character
 
     def _next(self):
