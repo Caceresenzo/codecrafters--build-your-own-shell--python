@@ -1,3 +1,6 @@
+import dataclasses
+import enum
+import io
 import typing
 
 END = "\0"
@@ -5,48 +8,88 @@ SPACE = " "
 SINGLE = "'"
 DOUBLE = '"'
 BACKSLASH = "\\"
+GREATER_THAN = ">"
+
+
+class StandardNamedStream(enum.Enum):
+    UNKNOWN = -1
+    OUTPUT = 1
+    ERROR = 2
+
+    def from_fd(x: int):
+        if x == 1:
+            return StandardNamedStream.OUTPUT
+
+        if x == 2:
+            return StandardNamedStream.ERROR
+
+        return StandardNamedStream.UNKNOWN
+
+
+@dataclasses.dataclass()
+class Redirect:
+    stream_name: StandardNamedStream
+    path: str
+    append: bool
 
 
 class LineParser:
 
     def __init__(self, line: str):
-        self._iterator = iter(line)
-        self._builder = ""
+        self._line = line
+        self._index = -1
+
+        self._arguments: typing.List[str] = []
+        self._redirects: typing.List[Redirect] = []
 
     def parse(self):
-        strings: typing.List[str] = []
+        while (argument := self.next_argument()) is not None:
+            self._arguments.append(argument)
+
+        return (
+            self._arguments,
+            self._redirects,
+        )
+
+    def next_argument(self):
+        builder = io.StringIO()
 
         while (character := self._next()) != END:
             if character == SPACE:
-                if self._builder:
-                    strings.append(self._builder)
-                    self._builder = ""
+                if builder.tell():
+                    return builder.getvalue()
             elif character == SINGLE:
-                self._single_quote()
+                self._single_quote(builder)
             elif character == DOUBLE:
-                self._double_quote()
+                self._double_quote(builder)
             elif character == BACKSLASH:
-                self._backslash(False)
+                self._backslash(builder, False)
+            elif character == GREATER_THAN:
+                self._redirect(StandardNamedStream.OUTPUT)
             else:
-                self._builder += character
+                if character.isdigit() and self._peek() == GREATER_THAN:
+                    self._next()
+                    self._redirect(StandardNamedStream.from_fd(int(character)))
+                else:
+                    builder.write(character)
 
-        if self._builder:
-            strings.append(self._builder)
+        if builder.tell():
+            return builder.getvalue()
 
-        return strings
+        return None
 
-    def _single_quote(self):
+    def _single_quote(self, builder: io.StringIO):
         while (character := self._next()) != END and character != SINGLE:
-            self._builder += character
+            builder.write(character)
 
-    def _double_quote(self):
+    def _double_quote(self, builder: io.StringIO):
         while (character := self._next()) != END and character != DOUBLE:
             if character == BACKSLASH:
-                self._backslash(True)
+                self._backslash(builder, True)
             else:
-                self._builder += character
+                builder.write(character)
 
-    def _backslash(self, in_quote: bool):
+    def _backslash(self, builder: io.StringIO, in_quote: bool):
         character = self._next()
         if character == END:
             return
@@ -57,9 +100,9 @@ class LineParser:
             if mapped != END:
                 character = mapped
             else:
-                self._builder += BACKSLASH
+                builder.write(BACKSLASH)
 
-        self._builder += character
+        builder.write(character)
 
     def _map_backlash_character(self, character: str):
         if character in [DOUBLE, BACKSLASH]:
@@ -67,5 +110,29 @@ class LineParser:
 
         return END
 
+    def _redirect(self, stream_name: StandardNamedStream):
+        append = self._peek() == GREATER_THAN
+        if append:
+            self._next()
+
+        path = self.next_argument()
+
+        self._redirects.append(Redirect(
+            stream_name,
+            path,
+            append,
+        ))
+
     def _next(self):
-        return next(self._iterator, END)
+        self._index += 1
+
+        return self._get_at(self._index)
+
+    def _peek(self):
+        return self._get_at(self._index + 1)
+
+    def _get_at(self, index: int):
+        if index >= len(self._line):
+            return END
+
+        return self._line[index]
