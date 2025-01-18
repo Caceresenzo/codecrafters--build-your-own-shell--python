@@ -12,15 +12,15 @@ def _write_and_flush(data: str):
     sys.stdout.flush()
 
 
-def autocomplete(line: str):
+def autocomplete(line: str, bell_rang: bool):
     if not line:
         return ""
 
-    candidates = []
+    candidates = set()
 
     for name in command.BUILTINS.keys():
         if name.startswith(line) and name != line:
-            candidates.append(name[len(line):])
+            candidates.add(name[len(line):])
 
     paths = os.environ.get("PATH", "").split(":")
     for path in paths:
@@ -35,32 +35,51 @@ def autocomplete(line: str):
             if not os.path.isfile(file_path) or not os.access(file_path, os.X_OK):
                 continue
 
-            candidates.append(file_name[len(line):])
+            candidates.add(file_name[len(line):])
 
     if not candidates:
-        return None
+        return None  # trigger the bell by mistake, but that fine
 
-    # if len(candidates) == 1:
-    if True:
-        candidate = candidates[0]
+    if len(candidates) == 1:
+        candidate = next(iter(candidates))
 
         return f"{candidate} "
 
-    # raise NotImplementedError("TODO")
+    if bell_rang:
+        sys.stdout.write("\n")
+
+        for index, candidate in enumerate(sorted(candidates)):
+            if index != 0:
+                sys.stdout.write("  ")
+
+            sys.stdout.write(line)
+            sys.stdout.write(candidate)
+
+        sys.stdout.write("\n")
+
+        prompt()
+
+        _write_and_flush(line)
+
+    return None
+
+
+def prompt():
+    _write_and_flush("$ ")
 
 
 def read():
     line = ""
 
+    prompt()
+
     stdin_fd = sys.stdin.fileno()
     previous = termios.tcgetattr(stdin_fd)
-
     tty.setcbreak(stdin_fd, termios.TCSANOW)
 
-    sys.stdout.write("$ ")
-    sys.stdout.flush()
-
     try:
+        bell_rang = False
+
         while True:
             character = sys.stdin.read(1)
 
@@ -76,13 +95,14 @@ def read():
                     break
 
                 case "\t":
-                    autocompleted = autocomplete(line)
+                    autocompleted = autocomplete(line, bell_rang)
 
                     if autocompleted:
-                        _write_and_flush(autocompleted)
                         line += autocompleted
+                        _write_and_flush(autocompleted)
                     else:
                         _write_and_flush("\a")
+                        bell_rang = True
 
                 case "\x7f":
                     if not line:
@@ -90,6 +110,8 @@ def read():
 
                     line = line[:-1]
                     _write_and_flush("\b \b")
+
+                    bell_rang = False
 
                 case _:
                     line += character
