@@ -1,27 +1,60 @@
 import os
 import sys
+import termios
+import tty
 import typing
 
 from . import command, parser
 
 
+def _write_and_flush(data: str):
+    sys.stdout.write(data)
+    sys.stdout.flush()
+
+
 def read():
+    line = ""
+
+    stdin_fd = sys.stdin.fileno()
+    previous = termios.tcgetattr(stdin_fd)
+
+    tty.setcbreak(stdin_fd, termios.TCSANOW)
+
     sys.stdout.write("$ ")
     sys.stdout.flush()
 
     try:
-        line = input()
+        while True:
+            character = sys.stdin.read(1)
 
-        if not len(line):
-            return [], []
+            match character:
+                case "\x04":
+                    return None, None
 
-        return parser.LineParser(line).parse()
-    except EOFError:
-        return None, None
+                case "\n":
+                    _write_and_flush("\n")
+                    break
+
+                case "\x7f":
+                    if not line:
+                        continue
+
+                    line = line[:-1]
+                    _write_and_flush("\b \b")
+
+                case _:
+                    line += character
+                    _write_and_flush(character)
     except KeyboardInterrupt:
-        sys.stdout.write("\n")
-        sys.stdout.flush()
+        _write_and_flush("\n")
         return [], []
+    finally:
+        termios.tcsetattr(stdin_fd, termios.TCSANOW, previous)
+
+    if not len(line):
+        return [], []
+
+    return parser.LineParser(line).parse()
 
 
 def eval(
