@@ -20,13 +20,12 @@ def autocomplete(line: str):
             candidates.append(name[len(line):])
 
     if not candidates:
-        return ""
+        return None
 
     if len(candidates) == 1:
         candidate = candidates[0]
 
-        _write_and_flush(candidate)
-        return candidate
+        return f"{candidate} "
 
     raise NotImplementedError("TODO")
 
@@ -58,7 +57,11 @@ def read():
                     break
 
                 case "\t":
-                    line += autocomplete(line)
+                    autocompleted = autocomplete(line)
+
+                    if autocompleted:
+                        _write_and_flush(autocompleted)
+                        line += autocompleted
 
                 case "\x7f":
                     if not line:
