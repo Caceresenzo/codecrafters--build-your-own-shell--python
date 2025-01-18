@@ -12,6 +12,35 @@ def _write_and_flush(data: str):
     sys.stdout.flush()
 
 
+def _find_shared_prefix(candidates: typing.List[str]):
+    candidates = sorted(candidates, key=lambda x: (len(x), x))
+
+    first, *others = candidates
+
+    end = 0
+    for end in range(1, len(first) + 1):
+        for other in others:
+            other = other[:end]
+
+            if not first.startswith(other):
+                break
+        else:
+            continue
+
+        end -= 1
+        break
+
+    return first[:end] or None
+
+# print(_find_shared_prefix([
+#     "xyz_foo",
+#     "xyz_foo_bar",
+#     "xyz_foo_bar_baz",
+#     "a"
+# ]))
+# exit()
+
+
 def autocomplete(line: str, bell_rang: bool):
     if not line:
         return ""
@@ -19,7 +48,7 @@ def autocomplete(line: str, bell_rang: bool):
     candidates = set()
 
     for name in command.BUILTINS.keys():
-        if name.startswith(line) and name != line:
+        if name.startswith(line):
             candidates.add(name[len(line):])
 
     paths = os.environ.get("PATH", "").split(":")
@@ -28,7 +57,7 @@ def autocomplete(line: str, bell_rang: bool):
             continue
 
         for file_name in os.listdir(path):
-            if not file_name.startswith(line) or file_name == line:
+            if not file_name.startswith(line):
                 continue
 
             file_path = os.path.join(path, file_name)
@@ -37,13 +66,17 @@ def autocomplete(line: str, bell_rang: bool):
 
             candidates.add(file_name[len(line):])
 
+    candidates = sorted(candidates)
     if not candidates:
         return None  # trigger the bell by mistake, but that fine
 
     if len(candidates) == 1:
-        candidate = next(iter(candidates))
-
+        candidate = candidates[0]
         return f"{candidate} "
+
+    shared_prefix = _find_shared_prefix(candidates)
+    if shared_prefix is not None:
+        return shared_prefix
 
     if bell_rang:
         sys.stdout.write("\n")
