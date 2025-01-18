@@ -12,6 +12,25 @@ def _write_and_flush(data: str):
     sys.stdout.flush()
 
 
+def autocomplete(line: str):
+    candidates = []
+
+    for name in command.BUILTINS.keys():
+        if name.startswith(line) and name != line:
+            candidates.append(name[len(line):])
+
+    if not candidates:
+        return ""
+
+    if len(candidates) == 1:
+        candidate = candidates[0]
+
+        _write_and_flush(candidate)
+        return candidate
+
+    raise NotImplementedError("TODO")
+
+
 def read():
     line = ""
 
@@ -29,11 +48,17 @@ def read():
 
             match character:
                 case "\x04":
+                    if line:
+                        continue
+
                     return None, None
 
                 case "\n":
                     _write_and_flush("\n")
                     break
+
+                case "\t":
+                    line += autocomplete(line)
 
                 case "\x7f":
                     if not line:
