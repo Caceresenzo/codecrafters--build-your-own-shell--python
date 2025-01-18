@@ -137,6 +137,10 @@ def read():
                         _write_and_flush("\a")
                         bell_rang = True
 
+                case "\x1b":
+                    sys.stdin.read(1)  # '['
+                    sys.stdin.read(1)  # 'A' or 'B' or 'C' or 'D'
+
                 case "\x7f":
                     if not line:
                         continue
