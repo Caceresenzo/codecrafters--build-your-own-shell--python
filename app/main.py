@@ -13,21 +13,40 @@ def _write_and_flush(data: str):
 
 
 def autocomplete(line: str):
+    if not line:
+        return ""
+
     candidates = []
 
     for name in command.BUILTINS.keys():
         if name.startswith(line) and name != line:
             candidates.append(name[len(line):])
 
+    paths = os.environ.get("PATH", "").split(":")
+    for path in paths:
+        if not os.path.isdir(path):
+            continue
+
+        for file_name in os.listdir(path):
+            if not file_name.startswith(line) or file_name == line:
+                continue
+
+            file_path = os.path.join(path, file_name)
+            if not os.path.isfile(file_path) or not os.access(file_path, os.X_OK):
+                continue
+
+            candidates.append(file_name[len(line):])
+
     if not candidates:
         return None
 
-    if len(candidates) == 1:
+    # if len(candidates) == 1:
+    if True:
         candidate = candidates[0]
 
         return f"{candidate} "
 
-    raise NotImplementedError("TODO")
+    # raise NotImplementedError("TODO")
 
 
 def read():
