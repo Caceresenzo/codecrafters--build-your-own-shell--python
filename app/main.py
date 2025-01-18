@@ -62,6 +62,8 @@ def read():
                     if autocompleted:
                         _write_and_flush(autocompleted)
                         line += autocompleted
+                    else:
+                        _write_and_flush("\a")
 
                 case "\x7f":
                     if not line:
