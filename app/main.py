@@ -152,7 +152,7 @@ def read():
 
                 case _:
                     line += character
-                    _write_and_flush(character)
+                    _write_and_flush(character.upper())
     except KeyboardInterrupt:
         _write_and_flush("\n")
         return [], []
