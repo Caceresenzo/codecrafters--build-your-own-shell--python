@@ -4,7 +4,8 @@ import termios
 import tty
 import typing
 
-from . import command, parser
+from . import command, parser, run
+from .command import BUILTINS, RedirectStreams, which
 
 
 def _write_and_flush(data: str):
@@ -47,7 +48,7 @@ def autocomplete(line: str, bell_rang: bool):
 
     candidates = set()
 
-    for name in command.BUILTINS.keys():
+    for name in BUILTINS.keys():
         if name.startswith(line):
             candidates.add(name[len(line):])
 
@@ -121,7 +122,7 @@ def read():
                     if line:
                         continue
 
-                    return None, None
+                    return None
 
                 case "\n":
                     _write_and_flush("\n")
@@ -155,60 +156,36 @@ def read():
                     _write_and_flush(character)
     except KeyboardInterrupt:
         _write_and_flush("\n")
-        return [], []
+        return []
     finally:
         termios.tcsetattr(stdin_fd, termios.TCSANOW, previous)
 
     if not len(line):
-        return [], []
+        return []
 
     return parser.LineParser(line).parse()
 
 
 def eval(
-    arguments: typing.List[str],
-    redirects: typing.List[parser.Redirect]
+    commands: typing.List[parser.Command]
 ):
-    redirected_streams = command.RedirectStreams.open(redirects)
-
-    program = arguments[0]
-
-    builtin = command.BUILTINS.get(program)
-    if builtin:
-        builtin(arguments, redirected_streams)
-        redirected_streams.close()
-        return
-
-    path = command.which(program)
-    if path:
-        pid = os.fork()
-
-        if not pid:
-            os.dup2(redirected_streams.output_fd, 1)
-            os.dup2(redirected_streams.error_fd, 2)
-            redirected_streams.close()
-
-            os.execv(path, arguments)
-            exit(1)
-
-        os.waitpid(pid, 0)
+    if len(commands) == 1:
+        run.single(commands[0])
     else:
-        print(f"{program}: command not found")
-
-    redirected_streams.close()
+        run.pipeline(commands)
 
 
 def main():
     while True:
-        arguments, redirects = read()
+        commands = read()
 
-        if arguments is None:
+        if commands is None:
             break
 
-        if not len(arguments):
+        if not len(commands):
             continue
 
-        eval(arguments, redirects)
+        eval(commands)
 
 
 if __name__ == "__main__":
