@@ -11,13 +11,13 @@ def _exec(command: Command):
     if builtin:
         builtin(command.arguments, redirected_streams)
         redirected_streams.close()
-        return
+        os._exit(0)
 
     path = which(command.program)
     if not path:
         print(f"{command.program}: command not found")
         redirected_streams.close()
-        return
+        os._exit(1)
 
     os.dup2(redirected_streams.output_fd, 1)
     os.dup2(redirected_streams.error_fd, 2)
