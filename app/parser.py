@@ -9,6 +9,7 @@ SINGLE = "'"
 DOUBLE = '"'
 BACKSLASH = "\\"
 GREATER_THAN = ">"
+PIPE = "|"
 
 
 class StandardNamedStream(enum.Enum):
@@ -33,11 +34,23 @@ class Redirect:
     append: bool
 
 
+@dataclasses.dataclass()
+class Command:
+    arguments: typing.List[str]
+    redirects: typing.List[Redirect]
+
+    @property
+    def program(self):
+        return self.arguments[0]
+
+
 class LineParser:
 
     def __init__(self, line: str):
         self._line = line
         self._index = -1
+
+        self._commands: typing.List[Command] = []
 
         self._arguments: typing.List[str] = []
         self._redirects: typing.List[Redirect] = []
@@ -46,10 +59,13 @@ class LineParser:
         while (argument := self.next_argument()) is not None:
             self._arguments.append(argument)
 
-        return (
-            self._arguments,
-            self._redirects,
-        )
+        if self._arguments:
+            self._commands.append(Command(
+                self._arguments,
+                self._redirects,
+            ))
+
+        return self._commands
 
     def next_argument(self):
         builder = io.StringIO()
@@ -66,6 +82,8 @@ class LineParser:
                 self._backslash(builder, False)
             elif character == GREATER_THAN:
                 self._redirect(StandardNamedStream.OUTPUT)
+            elif character == PIPE:
+                self._pipe()
             else:
                 if character.isdigit() and self._peek() == GREATER_THAN:
                     self._next()
@@ -122,6 +140,15 @@ class LineParser:
             path,
             append,
         ))
+
+    def _pipe(self):
+        self._commands.append(Command(
+            self._arguments,
+            self._redirects,
+        ))
+
+        self._arguments = []
+        self._redirects = []
 
     def _next(self):
         self._index += 1
