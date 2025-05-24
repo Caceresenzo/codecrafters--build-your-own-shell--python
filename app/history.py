@@ -5,6 +5,8 @@ def add_line(line):
     previous_lines.append(line)
 
 
-def iterate():
-    for index, line in enumerate(previous_lines):
+def iterate(start=0):
+    lines = previous_lines[-start:]
+
+    for index, line in enumerate(lines, start):
         yield (index + 1, line)
