@@ -150,10 +150,15 @@ def builtin_cd(arguments: typing.List[str], redirect_streams: RedirectStreams):
         print(f"{path}: Permission denied", file=redirect_streams.error)
 
 
+def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStreams):
+    pass
+
+
 BUILTINS = {
     "exit": builtin_exit,
     "echo": builtin_echo,
     "type": builtin_type,
     "pwd": builtin_pwd,
     "cd": builtin_cd,
+    "history": builtin_history,
 }
