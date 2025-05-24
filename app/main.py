@@ -97,6 +97,17 @@ def prompt():
 def read():
     line = ""
 
+    history_index = len(history.previous_lines) - 1
+
+    def change_line(new_line: str):
+        nonlocal line
+        _write_and_flush("\r" + " " * (len(line) + 2) + "\r")
+
+        prompt()
+
+        line = new_line
+        _write_and_flush(line)
+
     prompt()
 
     stdin_fd = sys.stdin.fileno()
@@ -132,7 +143,11 @@ def read():
 
                 case "\x1b":
                     sys.stdin.read(1)  # '['
-                    sys.stdin.read(1)  # 'A' or 'B' or 'C' or 'D'
+                    direction = sys.stdin.read(1)  # 'A' or 'B' or 'C' or 'D'
+
+                    if direction == 'A' and history_index != -1:
+                        change_line(history.previous_lines[history_index])
+                        history_index -= 1
 
                 case "\x7f":
                     if not line:
