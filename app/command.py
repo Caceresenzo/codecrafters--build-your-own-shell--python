@@ -3,7 +3,7 @@ import os
 import sys
 import typing
 
-from . import parser
+from . import parser, history
 
 
 class RedirectStreams:
@@ -151,7 +151,8 @@ def builtin_cd(arguments: typing.List[str], redirect_streams: RedirectStreams):
 
 
 def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    pass
+    for number, line in history.iterate():
+        print(f"{number:-5}  {line}", file=redirect_streams.output)
 
 
 BUILTINS = {
