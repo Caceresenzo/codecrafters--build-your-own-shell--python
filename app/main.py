@@ -4,7 +4,7 @@ import termios
 import tty
 import typing
 
-from . import parser, run
+from . import history, parser, run
 from .command import BUILTINS
 
 
@@ -32,14 +32,6 @@ def _find_shared_prefix(candidates: typing.List[str]):
         break
 
     return first[:end] or None
-
-# print(_find_shared_prefix([
-#     "xyz_foo",
-#     "xyz_foo_bar",
-#     "xyz_foo_bar_baz",
-#     "a"
-# ]))
-# exit()
 
 
 def autocomplete(line: str, bell_rang: bool):
@@ -163,6 +155,7 @@ def read():
     if not len(line):
         return []
 
+    history.add_line(line)
     return parser.LineParser(line).parse()
 
 
