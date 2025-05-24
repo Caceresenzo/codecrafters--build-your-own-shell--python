@@ -151,7 +151,9 @@ def builtin_cd(arguments: typing.List[str], redirect_streams: RedirectStreams):
 
 
 def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    for number, line in history.iterate():
+    start = int(arguments[1]) if len(arguments) > 1 else 0
+
+    for number, line in history.iterate(start):
         print(f"{number:-5}  {line}", file=redirect_streams.output)
 
 
