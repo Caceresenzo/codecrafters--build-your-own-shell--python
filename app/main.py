@@ -8,6 +8,10 @@ from . import history, parser, run
 from .command import BUILTINS
 
 
+UP = "A"
+DOWN = "B"
+
+
 def _write_and_flush(data: str):
     sys.stdout.write(data)
     sys.stdout.flush()
@@ -97,7 +101,8 @@ def prompt():
 def read():
     line = ""
 
-    history_index = len(history.previous_lines) - 1
+    history_length = len(history.previous_lines)
+    history_position = history_length
 
     def change_line(new_line: str):
         nonlocal line
@@ -107,6 +112,22 @@ def read():
 
         line = new_line
         _write_and_flush(line)
+
+    def up_history():
+        nonlocal history_position
+        if history_position != 0:
+            history_position -= 1
+            change_line(history.previous_lines[history_position])
+
+    def down_history():
+        nonlocal history_position
+        if history_position < history_length:
+            history_position += 1
+
+            if history_position == history_length:
+                change_line("")
+            else:
+                change_line(history.previous_lines[history_position])
 
     prompt()
 
@@ -145,9 +166,10 @@ def read():
                     sys.stdin.read(1)  # '['
                     direction = sys.stdin.read(1)  # 'A' or 'B' or 'C' or 'D'
 
-                    if direction == 'A' and history_index != -1:
-                        change_line(history.previous_lines[history_index])
-                        history_index -= 1
+                    if direction == UP and history_position != 0:
+                        up_history()
+                    elif direction == DOWN:
+                        down_history()
 
                 case "\x7f":
                     if not line:
