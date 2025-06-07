@@ -1,4 +1,5 @@
 previous_lines = []
+last_append_index = 0
 
 
 def add_line(line):
@@ -21,7 +22,13 @@ def read(path: str):
                 add_line(line)
 
 
-def write(path: str):
-    with open(path, "w") as fd:
-        for line in previous_lines:
+def write(path: str, append=False):
+    global last_append_index
+
+    mode = "a" if append else "w"
+
+    with open(path, mode) as fd:
+        for line in previous_lines[last_append_index:]:
             fd.write(line + "\n")
+    
+    last_append_index = len(previous_lines)
