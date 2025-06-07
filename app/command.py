@@ -162,6 +162,9 @@ def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStrea
     elif argv1 == "-w":
         history.write(arguments[2])
         return
+    elif argv1 == "-a":
+        history.write(arguments[2], append=True)
+        return
 
     for number, line in history.iterate(start):
         print(f"{number:-5}  {line}", file=redirect_streams.output)
