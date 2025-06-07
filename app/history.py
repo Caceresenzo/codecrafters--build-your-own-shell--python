@@ -19,3 +19,9 @@ def read(path: str):
 
             if line:
                 add_line(line)
+
+
+def write(path: str):
+    with open(path, "w") as fd:
+        for line in previous_lines:
+            fd.write(line + "\n")
