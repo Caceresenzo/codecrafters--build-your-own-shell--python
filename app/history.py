@@ -47,3 +47,11 @@ def initialize():
         return
 
     read(path)
+
+
+def destroy():
+    path = os.environ.get(FILE_ENVVAR)
+    if not path:
+        return
+
+    write(path)

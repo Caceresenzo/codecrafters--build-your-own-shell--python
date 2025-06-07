@@ -199,13 +199,15 @@ def eval(
     commands: typing.List[parser.Command]
 ):
     if len(commands) == 1:
-        run.single(commands[0])
+        return run.single(commands[0])
     else:
         run.pipeline(commands)
 
 
 def main():
     history.initialize()
+
+    shell_exit_code = None
 
     while True:
         commands = read()
@@ -216,8 +218,14 @@ def main():
         if not len(commands):
             continue
 
-        eval(commands)
+        shell_exit_code = eval(commands)
+        if shell_exit_code is not None:
+            break
 
+    history.destroy()
+
+    if shell_exit_code is not None:
+        exit(shell_exit_code)
 
 if __name__ == "__main__":
     main()

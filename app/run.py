@@ -67,9 +67,9 @@ def single(command: Command):
 
     builtin = BUILTINS.get(command.program)
     if builtin:
-        builtin(command.arguments, redirected_streams)
+        shell_exit_code = builtin(command.arguments, redirected_streams)
         redirected_streams.close()
-        return
+        return shell_exit_code
 
     path = which(command.program)
     if not path:
