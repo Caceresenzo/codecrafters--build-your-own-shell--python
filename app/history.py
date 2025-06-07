@@ -10,3 +10,12 @@ def iterate(start=0):
 
     for index, line in enumerate(lines, start):
         yield (index + 1, line)
+
+
+def read(path: str):
+    with open(path, "r") as fd:
+        for line in fd:
+            line = line.strip("\n")
+
+            if line:
+                add_line(line)
