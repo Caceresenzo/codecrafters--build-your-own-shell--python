@@ -92,8 +92,10 @@ def which(program: str):
     return None
 
 
-def builtin_exit(_, __):
-    exit(0)
+def builtin_exit(arguments: typing.List[str], __):
+    code = int(arguments[1]) if len(arguments) > 1 else 0
+
+    return code
 
 
 def builtin_echo(arguments: typing.List[str], redirect_streams: RedirectStreams):
