@@ -205,6 +205,8 @@ def eval(
 
 
 def main():
+    history.initialize()
+
     while True:
         commands = read()
 
