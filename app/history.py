@@ -21,7 +21,9 @@ def read(path: str):
                 add_line(line)
 
 
-def write(path: str):
-    with open(path, "w") as fd:
+def write(path: str, append=False):
+    mode = "a" if append else "w"
+
+    with open(path, mode) as fd:
         for line in previous_lines:
             fd.write(line + "\n")

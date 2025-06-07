@@ -1,0 +1,6 @@
+echo hello
+echo world
+history -w aaa
+cat aaa
+history -w aaa
+history -w aaa
