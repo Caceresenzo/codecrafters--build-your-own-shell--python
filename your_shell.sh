@@ -5,4 +5,12 @@
 # CodeCrafters uses this file to test your code. Don't make any changes here!
 #
 # DON'T EDIT THIS!
-exec pipenv run python3 -m app.main "$@"
+set -ex
+
+SCRIPT_DIR="$(dirname "$0")"
+export PYTHONPATH="$SCRIPT_DIR"
+
+exec pipenv \
+    --quiet \
+    run \
+    python3 -m app.main "$@"
