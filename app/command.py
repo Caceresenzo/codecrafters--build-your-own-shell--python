@@ -86,7 +86,7 @@ def which(program: str):
     for path in paths:
         path = os.path.join(path, program)
 
-        if os.path.exists(path):
+        if os.access(path, os.X_OK):
             return path
 
     return None
