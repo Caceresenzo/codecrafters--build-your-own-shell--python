@@ -1,9 +1,12 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/376b1d59-6a96-4bb9-8980-1219374ddd7a)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+[![progress-banner](https://backend.codecrafters.io/progress/shell/a182da9f-3418-4ed2-bbdf-74459bb090db)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
 This is a starting point for Python solutions to the
 ["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
 
-_Add a description of your course here_
+In this challenge, you'll build your own POSIX compliant shell that's capable of
+interpreting shell commands, running external programs and builtin commands like
+cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
+REPLs, builtin commands, and more.
 
 **Note**: If you're viewing this repo on GitHub, head over to
 [codecrafters.io](https://codecrafters.io) to try the challenge.
@@ -11,12 +14,11 @@ _Add a description of your course here_
 # Passing the first stage
 
 The entry point for your `shell` implementation is in `app/main.py`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+uncomment the relevant code, then run the command below to execute the tests on
+our servers:
 
 ```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
+codecrafters submit
 ```
 
 Time to move on to the next stage!
@@ -25,8 +27,8 @@ Time to move on to the next stage!
 
 Note: This section is for stages 2 and beyond.
 
-1. Ensure you have `python (3.11)` installed locally
-1. Run `./your_shell.sh` to run your program, which is implemented in
+1. Ensure you have `uv` installed locally
+1. Run `./your_program.sh` to run your program, which is implemented in
    `app/main.py`.
 1. Commit your changes and run `git push origin master` to submit your solution
    to CodeCrafters. Test output will be streamed to your terminal.
