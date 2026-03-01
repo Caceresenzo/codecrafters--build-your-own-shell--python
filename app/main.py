@@ -88,6 +88,10 @@ def autocomplete(line: str, bell_rang: bool):
             if not name.startswith(prefix):
                 continue
 
+            path = os.path.join(directory, name)
+            if os.path.isdir(path):
+                name += "/"
+
             candidates.add(name[len(prefix):])
 
     candidates = sorted(candidates)
@@ -96,6 +100,10 @@ def autocomplete(line: str, bell_rang: bool):
 
     if len(candidates) == 1:
         candidate = candidates[0]
+
+        if candidate.endswith("/"):
+            return candidate
+
         return f"{candidate} "
 
     shared_prefix = _find_shared_prefix(candidates)
@@ -109,7 +117,7 @@ def autocomplete(line: str, bell_rang: bool):
             if index != 0:
                 sys.stdout.write("  ")
 
-            sys.stdout.write(line)
+            sys.stdout.write(beginning)
             sys.stdout.write(candidate)
 
         sys.stdout.write("\n")
