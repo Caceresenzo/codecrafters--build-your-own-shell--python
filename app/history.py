@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 FILE_ENVVAR = "HISTFILE"
 
@@ -10,11 +11,14 @@ def add_line(line):
     previous_lines.append(line)
 
 
-def iterate(start=0):
-    lines = previous_lines[-start:]
+def iterate(start: Optional[int] = None):
+    if start is None:
+        start = 0
+    else:
+        start = len(previous_lines) - start
 
-    for index, line in enumerate(lines, start):
-        yield (index + 1, line)
+    for index in range(start, len(previous_lines)):
+        yield (index + 1, previous_lines[index])
 
 
 def read(path: str):
