@@ -86,7 +86,7 @@ def which(program: str):
     for path in paths:
         path = os.path.join(path, program)
 
-        if os.path.exists(path):
+        if os.access(path, os.X_OK):
             return path
 
     return None
@@ -153,7 +153,7 @@ def builtin_cd(arguments: typing.List[str], redirect_streams: RedirectStreams):
 
 
 def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    start = 0
+    start = None
 
     argv1 = arguments[1] if len(arguments) > 1 else None
     if argv1 and argv1.isdigit():

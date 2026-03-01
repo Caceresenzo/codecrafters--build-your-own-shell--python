@@ -1,0 +1,7 @@
+echo hello
+echo world
+history -r hist
+echo hello
+echo world
+echo another
+history -a hist
