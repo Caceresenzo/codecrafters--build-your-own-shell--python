@@ -5,4 +5,11 @@
 # CodeCrafters uses this file to test your code. Don't make any changes here!
 #
 # DON'T EDIT THIS!
-exec pipenv run python3 -m app.main "$@"
+
+SCRIPT_DIR="$(dirname "$0")"
+
+exec pipenv \
+    --quiet \
+    --where "$SCRIPT_DIR" \
+    run \
+    python3 -m app.main "$@"
