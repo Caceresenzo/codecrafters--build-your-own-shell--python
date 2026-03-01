@@ -43,24 +43,52 @@ def autocomplete(line: str, bell_rang: bool):
 
     candidates = set()
 
-    for name in BUILTINS.keys():
-        if name.startswith(line):
-            candidates.add(name[len(line):])
+    last_space_index = line.rfind(" ")
+    is_command = last_space_index == -1
+    beginning = (
+        line
+        if is_command
+        else line[last_space_index + 1:]
+    ).strip()
 
-    paths = os.environ.get("PATH", "").split(":")
-    for path in paths:
-        if not os.path.isdir(path):
-            continue
+    if not beginning:
+        parent = None
+        prefix = ""
+    elif beginning.endswith("/"):
+        parent = os.path.normpath(os.path.join(os.getcwd(), beginning))
+        prefix = ""
+    else:
+        parent = os.path.normpath(os.path.join(os.getcwd(), os.path.dirname(beginning)))
+        prefix = os.path.basename(beginning)
 
-        for file_name in os.listdir(path):
-            if not file_name.startswith(line):
+    if is_command:
+        for name in BUILTINS.keys():
+            if name.startswith(prefix):
+                candidates.add(name[len(prefix):])
+
+        paths = os.environ.get("PATH", "").split(":")
+        for path in paths:
+            if not os.path.isdir(path):
                 continue
 
-            file_path = os.path.join(path, file_name)
-            if not os.path.isfile(file_path) or not os.access(file_path, os.X_OK):
+            for file_name in os.listdir(path):
+                if not file_name.startswith(prefix):
+                    continue
+
+                file_path = os.path.join(path, file_name)
+                if not os.path.isfile(file_path) or not os.access(file_path, os.X_OK):
+                    continue
+
+                candidates.add(file_name[len(prefix):])
+    
+    if True:
+        directory = parent or os.getcwd()
+
+        for name in os.listdir(directory):
+            if not name.startswith(prefix):
                 continue
 
-            candidates.add(file_name[len(line):])
+            candidates.add(name[len(prefix):])
 
     candidates = sorted(candidates)
     if not candidates:
