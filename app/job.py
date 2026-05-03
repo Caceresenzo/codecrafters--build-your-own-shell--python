@@ -29,5 +29,14 @@ def remove(pid: int):
 
 
 def dump():
-    for job in running:
-        print(f"[{job.number}]+  Running                 {job.command} &")
+    most_recent_index = len(running) - 1
+    previous_index = most_recent_index - 1
+
+    for index, job in enumerate(running):
+        symbol = " "
+        if index == most_recent_index:
+            symbol = "+"
+        elif index == previous_index:
+            symbol = "-"
+
+        print(f"[{job.number}]{symbol}  Running                 {job.command} &")
