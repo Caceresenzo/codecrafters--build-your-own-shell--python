@@ -63,6 +63,7 @@ def pipeline(commands: list[Command]):
 
 
 def single(command: Command):
+    print(command)
     redirected_streams = RedirectStreams.open(command.redirects)
 
     builtin = BUILTINS.get(command.program)
@@ -86,6 +87,10 @@ def single(command: Command):
 
         os.execv(path, command.arguments)
         os._exit(1)
+
+    if command.is_job:
+        print(f"[1] {pid}")
+        return
 
     os.waitpid(pid, 0)
     redirected_streams.close()
