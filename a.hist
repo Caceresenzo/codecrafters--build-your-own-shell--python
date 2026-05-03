@@ -1,0 +1,104 @@
+qsd
+complete -p git
+complete -p git
+complete  -C  /tmp/orange.py  docker
+complete -p git
+complete -p docker
+complete  -C  /tmp/orange.py  docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run
+ 
+docker 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ 
+ls 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run run run run run run run run run run run run run run run run run run run 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.py git
+complete -C ./compl.py git
+complete -C ./compl.py git
+jobs
+type jobs
+sleep 10 &
+sleep 10 &
+sleep 10 &
+sleep 10 &
+sleep 10 &
+sleep 2 && echo "Done sleeping" &
+sleep 10 &
+jobs
+sleep 10 &
+jobs
+sleep 10 &
+sleep 10 &
+sleep 10 &
+jobs
+cat a
+cat a &
+jobs
+jobs
+jobs
+sleep 10 &
+jobs
+jobs
+jobs
+jobs
+cat compl.py &
+jobs
+cat compl.py &
+cat compl.py &
+cat compl.py &
+cat compl.py &
+cat compl.py &
+jobs
+cat /tmp/raspberry-5 &
+cat /tmp/raspberry-5 &
+jobs
+jobs
+cat /tmp/raspberry-5 &
+jobs
+sleep 500 &
+cat compl.py &
+echo orange
+jobs
+sleep 500 &
+cat compl.py &
+echo orange
+jobs
+declare -p missing_variable

@@ -205,7 +205,12 @@ def builtin_jobs(arguments: typing.List[str], redirect_streams: RedirectStreams)
 
 
 def builtin_declare(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    pass
+    flag = arguments[1]
+
+    if flag == "-p":
+        name = arguments[2]
+
+        print(f"{arguments[0]}: {name}: not found", file=redirect_streams.error)
 
 
 BUILTINS = {
