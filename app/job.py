@@ -29,6 +29,17 @@ def remove(pid: int):
             break
 
 
+def reap():
+    indices_to_remove = []
+
+    for index, job in enumerate(running):
+        if not _is_running(job.pid):
+            indices_to_remove.append(index)
+
+    for index in reversed(indices_to_remove):
+        running.pop(index)
+
+
 def dump():
     most_recent_index = len(running) - 1
     previous_index = most_recent_index - 1
