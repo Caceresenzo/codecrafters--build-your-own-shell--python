@@ -1,6 +1,8 @@
+import os
 import selectors
 import subprocess
 from typing import Dict, Optional, Set
+
 from .parser import LineParser
 
 registered: Dict[str, str] = {}
@@ -23,12 +25,19 @@ def collect(program: str, line: str) -> Optional[Set[str]]:
     last_argument = command.arguments[-1]
     previous_argument = command.arguments[-2] if len(command.arguments) > 1 else ""
 
+    env = {
+        **os.environ,
+        "COMP_LINE": line,
+        "COMP_POINT": str(len(line)),
+    }
+
     process = subprocess.Popen(
         [handler_path, program, last_argument, previous_argument],
         bufsize=1,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True,
+        env=env,
     )
 
     candidates: Set[str] = set()
