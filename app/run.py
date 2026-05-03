@@ -87,5 +87,9 @@ def single(command: Command):
         os.execv(path, command.arguments)
         os._exit(1)
 
+    if command.is_job:
+        print(f"[1] {pid}")
+        return
+
     os.waitpid(pid, 0)
     redirected_streams.close()

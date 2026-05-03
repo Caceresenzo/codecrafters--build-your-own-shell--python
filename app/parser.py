@@ -10,6 +10,7 @@ DOUBLE = '"'
 BACKSLASH = "\\"
 GREATER_THAN = ">"
 PIPE = "|"
+AMPERSAND = "&"
 
 
 class StandardNamedStream(enum.Enum):
@@ -38,6 +39,7 @@ class Redirect:
 class Command:
     arguments: typing.List[str]
     redirects: typing.List[Redirect]
+    is_job: bool = False
 
     @property
     def program(self):
@@ -54,6 +56,7 @@ class LineParser:
 
         self._arguments: typing.List[str] = []
         self._redirects: typing.List[Redirect] = []
+        self._is_job = False
 
     def parse(self):
         while (argument := self.next_argument()) is not None:
@@ -63,6 +66,7 @@ class LineParser:
             self._commands.append(Command(
                 self._arguments,
                 self._redirects,
+                self._is_job,
             ))
 
         return self._commands
@@ -84,6 +88,9 @@ class LineParser:
                 self._redirect(StandardNamedStream.OUTPUT)
             elif character == PIPE:
                 self._pipe()
+            elif character == AMPERSAND:
+                # TODO Reject double ampersand
+                self._is_job = True
             else:
                 if character.isdigit() and self._peek() == GREATER_THAN:
                     self._next()
@@ -145,10 +152,12 @@ class LineParser:
         self._commands.append(Command(
             self._arguments,
             self._redirects,
+            self._is_job,
         ))
 
         self._arguments = []
         self._redirects = []
+        self._is_job = False
 
     def _next(self):
         self._index += 1
