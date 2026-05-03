@@ -54,12 +54,18 @@ def collect(program: str, line: str) -> Optional[Set[str]]:
         selector.register(process.stdout, selectors.EVENT_READ, handle_output)
 
         while process.poll() is None:
-            events = selector.select()
-
-            for key, mask in events:
-                callback = key.data
-                callback(key.fileobj, mask)
+            _collect(selector)
 
         process.wait()
 
+        _collect(selector)
+
     return candidates
+
+
+def _collect(selector: selectors.BaseSelector):
+    events = selector.select()
+
+    for key, mask in events:
+        callback = key.data
+        callback(key.fileobj, mask)
