@@ -49,15 +49,22 @@ class Argument:
     def resolve(self, variables: Dict[str, str]):
         builder = StringIO()
 
+        can_be_skipped = True
+
         for part in self.parts:
             if isinstance(part, LiteralPart):
                 builder.write(part.value)
+                can_be_skipped = False
             elif isinstance(part, VariablePart):
                 builder.write(variables.get(part.name, ""))
             else:
                 raise NotImplementedError()
 
-        return builder.getvalue()
+        resolved = builder.getvalue()
+        if not resolved and can_be_skipped:
+            return None
+
+        return resolved
 
     def __str__(self):
         return self.resolve(variable.store)
@@ -85,10 +92,15 @@ class Command:
 
     @cached_property
     def arguments(self):
-        return [
-            str(argument)
-            for argument in self.raw_arguments
-        ]
+        resolveds = []
+
+        for argument in self.raw_arguments:
+            resolved = argument.resolve(variable.store)
+
+            if resolved is not None:
+                resolveds.append(resolved)
+
+        return resolveds
 
     @property
     def program(self):
