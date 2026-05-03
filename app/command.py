@@ -172,6 +172,10 @@ def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStrea
         print(f"{number:-5}  {line}", file=redirect_streams.output)
 
 
+def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStreams):
+    pass
+
+
 BUILTINS = {
     "exit": builtin_exit,
     "echo": builtin_echo,
@@ -179,4 +183,5 @@ BUILTINS = {
     "pwd": builtin_pwd,
     "cd": builtin_cd,
     "history": builtin_history,
+    "complete": builtin_complete,
 }
