@@ -12,6 +12,10 @@ def register(program: str, handler_path: str):
     registered[program] = handler_path
 
 
+def unregister(program: str) -> bool:
+    return registered.pop(program, None) is not None
+
+
 def get_handler(program: str) -> Optional[str]:
     return registered.get(program)
 

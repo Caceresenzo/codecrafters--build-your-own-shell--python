@@ -190,6 +190,12 @@ def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStre
         else:
             print(f"{arguments[0]}: {program_name}: no completion specification", file=redirect_streams.error)
 
+    elif flag == "-r":
+        program_name = arguments[2]
+
+        if not completer.unregister(program_name):
+            print(f"{arguments[0]}: {program_name}: no completion specification", file=redirect_streams.error)
+
     else:
         print(f"{arguments[0]}: unknown flag: {flag}", file=redirect_streams.error)
 
