@@ -59,7 +59,7 @@ class RedirectStreams:
         error = None
 
         for redirect in redirects:
-            stream = open(redirect.path, "a" if redirect.append else "w")
+            stream = open(str(redirect.path), "a" if redirect.append else "w")
 
             if redirect.stream_name == parser.StandardNamedStream.OUTPUT:
                 if output:

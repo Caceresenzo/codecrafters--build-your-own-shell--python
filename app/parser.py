@@ -1,7 +1,11 @@
-import dataclasses
-import enum
-import io
-import typing
+from abc import ABC
+from dataclasses import dataclass
+from enum import Enum
+from functools import cached_property
+from io import StringIO
+from typing import Dict, List
+
+from . import variable
 
 END = "\0"
 SPACE = " "
@@ -11,9 +15,10 @@ BACKSLASH = "\\"
 GREATER_THAN = ">"
 PIPE = "|"
 AMPERSAND = "&"
+DOLLAR = "$"
 
 
-class StandardNamedStream(enum.Enum):
+class StandardNamedStream(Enum):
     UNKNOWN = -1
     OUTPUT = 1
     ERROR = 2
@@ -28,18 +33,60 @@ class StandardNamedStream(enum.Enum):
         return StandardNamedStream.UNKNOWN
 
 
-@dataclasses.dataclass()
+@dataclass
 class Redirect:
     stream_name: StandardNamedStream
-    path: str
+    path: "Argument"
     append: bool
 
 
-@dataclasses.dataclass()
+@dataclass
+class Argument:
+    parts: List["ArgumentPart"]
+
+    def resolve(self, variables: Dict[str, str]):
+        builder = StringIO()
+
+        for part in self.parts:
+            if isinstance(part, LiteralPart):
+                builder.write(part.value)
+            elif isinstance(part, VariablePart):
+                builder.write(variables.get(part.name, ""))
+            else:
+                raise NotImplementedError()
+
+        return builder.getvalue()
+
+    def __str__(self):
+        return self.resolve(variable.store)
+
+
+class ArgumentPart(ABC):
+    ...
+
+
+@dataclass
+class LiteralPart(ArgumentPart):
+    value: str
+
+
+@dataclass
+class VariablePart(ArgumentPart):
+    name: str
+
+
+@dataclass
 class Command:
-    arguments: typing.List[str]
-    redirects: typing.List[Redirect]
+    raw_arguments: List[Argument]
+    redirects: List[Redirect]
     is_job: bool = False
+
+    @cached_property
+    def arguments(self):
+        return [
+            str(argument)
+            for argument in self.raw_arguments
+        ]
 
     @property
     def program(self):
@@ -52,10 +99,11 @@ class LineParser:
         self._line = line
         self._index = -1
 
-        self._commands: typing.List[Command] = []
+        self._commands: List[Command] = []
+        self._arguments: List[ArgumentPart] = []
 
-        self._arguments: typing.List[str] = []
-        self._redirects: typing.List[Redirect] = []
+        self._argument_parts: List[ArgumentPart] = []
+        self._redirects: List[Redirect] = []
         self._is_job = False
 
     def parse(self):
@@ -63,31 +111,41 @@ class LineParser:
             self._arguments.append(argument)
 
         if self._arguments:
-            self._commands.append(Command(
-                self._arguments,
-                self._redirects,
-                self._is_job,
-            ))
+            self._pipe()
 
         return self._commands
 
-    def next_argument(self):
-        builder = io.StringIO()
+    def _append_literal(self, character: str):
+        last_part = self._argument_parts[-1] if self._argument_parts else None
 
+        if isinstance(last_part, LiteralPart):
+            last_part.value += character
+        else:
+            self._argument_parts.append(LiteralPart(character))
+    
+    def _to_argument(self):
+        argument = Argument(self._argument_parts)
+        self._argument_parts = []
+
+        return argument
+
+    def next_argument(self):
         while (character := self._next()) != END:
             if character == SPACE:
-                if builder.tell():
-                    return builder.getvalue()
+                if self._argument_parts:
+                    return self._to_argument()
             elif character == SINGLE:
-                self._single_quote(builder)
+                self._single_quote()
             elif character == DOUBLE:
-                self._double_quote(builder)
+                self._double_quote()
             elif character == BACKSLASH:
-                self._backslash(builder, False)
+                self._backslash(False)
             elif character == GREATER_THAN:
                 self._redirect(StandardNamedStream.OUTPUT)
             elif character == PIPE:
                 self._pipe()
+            elif character == DOLLAR:
+                self._variable()
             elif character == AMPERSAND:
                 # TODO Reject double ampersand
                 self._is_job = True
@@ -96,25 +154,25 @@ class LineParser:
                     self._next()
                     self._redirect(StandardNamedStream.from_fd(int(character)))
                 else:
-                    builder.write(character)
+                    self._append_literal(character)
 
-        if builder.tell():
-            return builder.getvalue()
+        if self._argument_parts:
+            return self._to_argument()
 
         return None
 
-    def _single_quote(self, builder: io.StringIO):
+    def _single_quote(self):
         while (character := self._next()) != END and character != SINGLE:
-            builder.write(character)
+            self._append_literal(character)
 
-    def _double_quote(self, builder: io.StringIO):
+    def _double_quote(self):
         while (character := self._next()) != END and character != DOUBLE:
             if character == BACKSLASH:
-                self._backslash(builder, True)
+                self._backslash(True)
             else:
-                builder.write(character)
+                self._append_literal(character)
 
-    def _backslash(self, builder: io.StringIO, in_quote: bool):
+    def _backslash(self, in_quote: bool):
         character = self._next()
         if character == END:
             return
@@ -125,9 +183,9 @@ class LineParser:
             if mapped != END:
                 character = mapped
             else:
-                builder.write(BACKSLASH)
+                self._append_literal(BACKSLASH)
 
-        builder.write(character)
+        self._append_literal(character)
 
     def _map_backlash_character(self, character: str):
         if character in [DOUBLE, BACKSLASH]:
@@ -140,15 +198,24 @@ class LineParser:
         if append:
             self._next()
 
-        path = self.next_argument()
+        old_argument_parts = self._argument_parts
+
+        self._argument_parts = []
+        argument = self.next_argument()
+        assert len(self._argument_parts) == 1
+
+        self._argument_parts = old_argument_parts
 
         self._redirects.append(Redirect(
             stream_name,
-            path,
+            argument,
             append,
         ))
 
     def _pipe(self):
+        if self._argument_parts:
+            self._arguments.append(self._to_argument())
+
         self._commands.append(Command(
             self._arguments,
             self._redirects,
@@ -156,8 +223,18 @@ class LineParser:
         ))
 
         self._arguments = []
+        self._argument_parts = []
         self._redirects = []
         self._is_job = False
+
+    def _variable(self):
+        builder = StringIO()
+
+        while (character := self._peek()) != END and (character.isalnum() or character == "_"):
+            builder.write(self._next())
+
+        name = builder.getvalue()
+        self._argument_parts.append(VariablePart(name))
 
     def _next(self):
         self._index += 1
