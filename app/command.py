@@ -3,7 +3,7 @@ import os
 import sys
 import typing
 
-from . import completer, history, parser, job
+from . import completer, history, parser, job, variable
 
 
 class RedirectStreams:
@@ -210,7 +210,15 @@ def builtin_declare(arguments: typing.List[str], redirect_streams: RedirectStrea
     if flag == "-p":
         name = arguments[2]
 
-        print(f"{arguments[0]}: {name}: not found", file=redirect_streams.error)
+        value = variable.get(name)
+        if value is not None:
+            print(f"{arguments[0]} -- {name}=\"{value}\"", file=redirect_streams.output)
+        else:
+            print(f"{arguments[0]}: {name}: not found", file=redirect_streams.error)
+    elif "-" not in flag:
+        name, value = flag.split("=", 1)
+
+        variable.set(name, value)
 
 
 BUILTINS = {
