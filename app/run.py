@@ -2,6 +2,7 @@ import os
 
 from .command import BUILTINS, RedirectStreams, which
 from .parser import Command
+from . import job
 
 
 def _exec(command: Command):
@@ -88,7 +89,7 @@ def single(command: Command):
         os._exit(1)
 
     if command.is_job:
-        print(f"[1] {pid}")
+        job.add(pid, " ".join(command.arguments))
         return
 
     os.waitpid(pid, 0)
