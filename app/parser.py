@@ -115,20 +115,6 @@ class LineParser:
 
         return self._commands
 
-    def _append_literal(self, character: str):
-        last_part = self._argument_parts[-1] if self._argument_parts else None
-
-        if isinstance(last_part, LiteralPart):
-            last_part.value += character
-        else:
-            self._argument_parts.append(LiteralPart(character))
-    
-    def _to_argument(self):
-        argument = Argument(self._argument_parts)
-        self._argument_parts = []
-
-        return argument
-
     def next_argument(self):
         while (character := self._next()) != END:
             if character == SPACE:
@@ -160,6 +146,20 @@ class LineParser:
             return self._to_argument()
 
         return None
+
+    def _append_literal(self, character: str):
+        last_part = self._argument_parts[-1] if self._argument_parts else None
+
+        if isinstance(last_part, LiteralPart):
+            last_part.value += character
+        else:
+            self._argument_parts.append(LiteralPart(character))
+
+    def _to_argument(self):
+        argument = Argument(self._argument_parts)
+        self._argument_parts = []
+
+        return argument
 
     def _single_quote(self):
         while (character := self._next()) != END and character != SINGLE:
@@ -224,8 +224,18 @@ class LineParser:
     def _variable(self):
         builder = StringIO()
 
-        while (character := self._peek()) != END and (character.isalnum() or character == "_"):
+        ending_characters = [END]
+
+        is_braced = self._peek() == "{"
+        if is_braced:
+            ending_characters.append("}")
+            self._next()
+
+        while (character := self._peek()) not in ending_characters and (character.isalnum() or character == "_"):
             builder.write(self._next())
+
+        if is_braced and self._peek() == "}":
+            self._next()
 
         name = builder.getvalue()
         self._argument_parts.append(VariablePart(name))
