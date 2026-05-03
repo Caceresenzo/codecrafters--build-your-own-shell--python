@@ -173,7 +173,19 @@ def builtin_history(arguments: typing.List[str], redirect_streams: RedirectStrea
 
 
 def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    pass
+    flag = arguments[1]
+
+    if flag == "-C":
+        completer_path = arguments[2]
+        program_name = arguments[3]
+
+    elif flag == "-p":
+        program_name = arguments[2]
+
+        print(f"{arguments[0]}: {program_name}: no completion specification", file=redirect_streams.error)
+
+    else:
+        print(f"{arguments[0]}: unknown flag: {flag}", file=redirect_streams.error)
 
 
 BUILTINS = {
