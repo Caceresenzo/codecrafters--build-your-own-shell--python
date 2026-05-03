@@ -201,7 +201,7 @@ def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStre
 
 
 def builtin_jobs(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    job.dump()
+    job.reap(print_running=True)
 
 
 BUILTINS = {
