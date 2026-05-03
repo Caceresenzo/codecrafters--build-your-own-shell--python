@@ -1,0 +1,67 @@
+qsd
+complete -p git
+complete -p git
+complete  -C  /tmp/orange.py  docker
+complete -p git
+complete -p docker
+complete  -C  /tmp/orange.py  docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run
+ 
+docker 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ 
+ls 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run run run run run run run run run run run run run run run run run run run 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.py git
+complete -C ./compl.py git
+complete -C ./compl.py git
+jobs
+type jobs
+sleep 10 &
+sleep 10 &
+sleep 10 &
+sleep 10 &
+sleep 10 &
+sleep 2 && echo "Done sleeping" &
+sleep 10 &
+jobs
+sleep 10 &
+jobs

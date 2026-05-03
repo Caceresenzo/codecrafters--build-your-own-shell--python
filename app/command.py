@@ -3,7 +3,7 @@ import os
 import sys
 import typing
 
-from . import completer, history, parser
+from . import completer, history, parser, job
 
 
 class RedirectStreams:
@@ -201,7 +201,7 @@ def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStre
 
 
 def builtin_jobs(arguments: typing.List[str], redirect_streams: RedirectStreams):
-    pass
+    job.dump()
 
 
 BUILTINS = {
