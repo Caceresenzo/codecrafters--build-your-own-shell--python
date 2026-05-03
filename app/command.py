@@ -3,7 +3,7 @@ import os
 import sys
 import typing
 
-from . import history, parser
+from . import completer, history, parser
 
 
 class RedirectStreams:
@@ -179,10 +179,18 @@ def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStre
         completer_path = arguments[2]
         program_name = arguments[3]
 
+        completer.register(program_name, completer_path)
+
     elif flag == "-p":
         program_name = arguments[2]
 
-        print(f"{arguments[0]}: {program_name}: no completion specification", file=redirect_streams.error)
+        print(completer.registered)
+
+        handler_path = completer.get_handler(program_name)
+        if handler_path:
+            print(f"{arguments[0]} -C '{handler_path}' {program_name}", file=redirect_streams.output)
+        else:
+            print(f"{arguments[0]}: {program_name}: no completion specification", file=redirect_streams.error)
 
     else:
         print(f"{arguments[0]}: unknown flag: {flag}", file=redirect_streams.error)

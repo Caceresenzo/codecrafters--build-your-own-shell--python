@@ -1,0 +1,8 @@
+qsd
+complete -p git
+complete -p git
+complete  -C  /tmp/orange.py  docker
+complete -p git
+complete -p docker
+complete  -C  /tmp/orange.py  docker
+complete -p docker
