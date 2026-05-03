@@ -1,0 +1,52 @@
+qsd
+complete -p git
+complete -p git
+complete  -C  /tmp/orange.py  docker
+complete -p git
+complete -p docker
+complete  -C  /tmp/orange.py  docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -p docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run
+ 
+docker 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ run
+ 
+ls 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
+docker run run run run run run run run run run run run run run run run run run run 
+complete -C ./compl.sh docker
+complete -C ./compl.sh docker
