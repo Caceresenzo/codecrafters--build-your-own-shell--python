@@ -200,6 +200,10 @@ def builtin_complete(arguments: typing.List[str], redirect_streams: RedirectStre
         print(f"{arguments[0]}: unknown flag: {flag}", file=redirect_streams.error)
 
 
+def builtin_jobs(arguments: typing.List[str], redirect_streams: RedirectStreams):
+    pass
+
+
 BUILTINS = {
     "exit": builtin_exit,
     "echo": builtin_echo,
@@ -208,4 +212,5 @@ BUILTINS = {
     "cd": builtin_cd,
     "history": builtin_history,
     "complete": builtin_complete,
+    "jobs": builtin_jobs,
 }
