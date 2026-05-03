@@ -204,6 +204,10 @@ def builtin_jobs(arguments: typing.List[str], redirect_streams: RedirectStreams)
     job.reap(print_running=True)
 
 
+def builtin_declare(arguments: typing.List[str], redirect_streams: RedirectStreams):
+    pass
+
+
 BUILTINS = {
     "exit": builtin_exit,
     "echo": builtin_echo,
@@ -213,4 +217,5 @@ BUILTINS = {
     "history": builtin_history,
     "complete": builtin_complete,
     "jobs": builtin_jobs,
+    "declare": builtin_declare,
 }
