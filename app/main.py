@@ -84,7 +84,7 @@ def autocomplete(line: str, bell_rang: bool):
 
                 candidates.add(file_name[len(prefix):])
 
-    completer_candidates = completer.collect(command)
+    completer_candidates = completer.collect(command, line)
     if completer_candidates:
         for candidate in completer_candidates:
             if candidate.startswith(prefix):
