@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from typing import List, Tuple
 
@@ -32,6 +33,8 @@ def dump():
     most_recent_index = len(running) - 1
     previous_index = most_recent_index - 1
 
+    indices_to_remove = []
+
     for index, job in enumerate(running):
         symbol = " "
         if index == most_recent_index:
@@ -39,4 +42,17 @@ def dump():
         elif index == previous_index:
             symbol = "-"
 
-        print(f"[{job.number}]{symbol}  Running                 {job.command} &")
+        status = "Running"
+        if not _is_running(job.pid):
+            status = "Done"
+            indices_to_remove.append(index)
+
+        print(f"[{job.number}]{symbol}  {status:<20} {job.command}")
+
+    for index in reversed(indices_to_remove):
+        running.pop(index)
+
+
+def _is_running(pid):
+    pid, _ = os.waitpid(pid, os.WNOHANG)
+    return pid == 0
