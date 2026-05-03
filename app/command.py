@@ -3,7 +3,7 @@ import os
 import sys
 import typing
 
-from . import completer, history, parser, job, variable
+from . import completer, history, job, parser, variable
 
 
 class RedirectStreams:
@@ -217,6 +217,10 @@ def builtin_declare(arguments: typing.List[str], redirect_streams: RedirectStrea
             print(f"{arguments[0]}: {name}: not found", file=redirect_streams.error)
     elif "-" not in flag:
         name, value = flag.split("=", 1)
+
+        if not (name[0].isalpha() or name[0] == "_") or not all(character.isalnum() or character == "_" for character in name):
+            print(f"{arguments[0]}: `{name}={value}': not a valid identifier", file=redirect_streams.error)
+            return
 
         variable.set(name, value)
 
