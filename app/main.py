@@ -4,7 +4,7 @@ import termios
 import tty
 import typing
 
-from . import history, parser, run
+from . import completer, history, parser, run
 from .command import BUILTINS
 
 UP = "A"
@@ -43,6 +43,9 @@ def autocomplete(line: str, bell_rang: bool):
 
     candidates = set()
 
+    first_space_index = line.find(" ")
+    command = line if first_space_index == -1 else line[:first_space_index]
+
     last_space_index = line.rfind(" ")
     is_command = last_space_index == -1
     beginning = (
@@ -80,8 +83,17 @@ def autocomplete(line: str, bell_rang: bool):
                     continue
 
                 candidates.add(file_name[len(prefix):])
-    
-    if True:
+
+    completer_candidates = completer.collect(command)
+    if completer_candidates:
+        for candidate in completer_candidates:
+            if candidate.startswith(prefix):
+                candidate = candidate[len(prefix):]
+
+                if candidate:
+                    candidates.add(candidate)
+
+    else:
         directory = parent or os.getcwd()
 
         for name in os.listdir(directory):
@@ -262,6 +274,7 @@ def main():
 
     if shell_exit_code is not None:
         exit(shell_exit_code)
+
 
 if __name__ == "__main__":
     main()
