@@ -29,7 +29,7 @@ def remove(pid: int):
             break
 
 
-def dump():
+def reap(print_running=False):
     most_recent_index = len(running) - 1
     previous_index = most_recent_index - 1
 
@@ -46,6 +46,8 @@ def dump():
         if not _is_running(job.pid):
             status = "Done"
             indices_to_remove.append(index)
+        elif not print_running:
+            continue
 
         print(f"[{job.number}]{symbol}  {status:<20} {job.command}")
 

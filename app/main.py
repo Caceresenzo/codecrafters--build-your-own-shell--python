@@ -4,7 +4,7 @@ import termios
 import tty
 import typing
 
-from . import completer, history, parser, run
+from . import completer, history, job, parser, run
 from .command import BUILTINS
 
 UP = "A"
@@ -258,6 +258,8 @@ def main():
     shell_exit_code = None
 
     while True:
+        job.reap()
+
         commands = read()
 
         if commands is None:
